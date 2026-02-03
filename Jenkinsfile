@@ -21,13 +21,14 @@ pipeline {
 
     post {
         success {
-            // This is the CRITICAL part you need to add/update
             slackSend(
-                channel: '#general', 
-                color: 'good', 
-                message: "Build Successful! Job: ${env.JOB_NAME} Build: ${env.BUILD_NUMBER}"
+                channel: '#general',
+                color: 'good',
+                tokenCredentialId: 'slack-token', // This MUST match the ID in Jenkins Credentials
+                message: "SUCCESS: Job '${env.JOB_NAME}' [${env.BUILD_NUMBER}] (${env.BUILD_URL})"
             )
         }
+    }
         failure {
             slackSend(
                 channel: '#general',
