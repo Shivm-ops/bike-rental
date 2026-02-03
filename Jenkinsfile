@@ -18,14 +18,14 @@ pipeline {
             }
         }
     }
-
-   post {
+    
+    post {
         success {
             echo 'Build Successful! System is healthy.'
             slackSend(
                 channel: '#general', 
                 color: 'good', 
-                tokenCredentialId: 'slack-token', // Add this line!
+                tokenCredentialId: 'slack-token', //
                 message: "SUCCESS: Job '${env.JOB_NAME}' [${env.BUILD_NUMBER}] (${env.BUILD_URL})"
             )
         }
@@ -34,16 +34,8 @@ pipeline {
             slackSend(
                 channel: '#general',
                 color: 'danger', 
-                tokenCredentialId: 'slack-token', // Add this line!
+                tokenCredentialId: 'slack-token', //
                 message: "FAILED: Job '${env.JOB_NAME}' [${env.BUILD_NUMBER}] (${env.BUILD_URL})"
-            )
-        }
-    }
-        failure {
-            slackSend(
-                channel: '#general',
-                color: 'danger',
-                message: "Build Failed! Job: ${env.JOB_NAME} Build: ${env.BUILD_NUMBER}"
             )
         }
     }
