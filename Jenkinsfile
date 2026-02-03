@@ -1,13 +1,13 @@
 pipeline {
     agent any
     stages {
-        // ... your other stages (Build, Test) ...
+        // ... (your existing Build and Test stages) ...
     }
     post {
         success {
-            echo 'Build Successful! System is healthy.' // This stays in Jenkins
+            // This sends the actual message to Slack
             slackSend(
-                channel: '#general', // Use your Channel Name or ID here
+                channel: '#general', 
                 color: 'good', 
                 message: "SUCCESS: Job '${env.JOB_NAME}' [${env.BUILD_NUMBER}] (${env.BUILD_URL})"
             )
