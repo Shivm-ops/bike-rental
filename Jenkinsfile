@@ -21,14 +21,14 @@ pipeline {
     
     post {
         success {
-            echo 'Build Successful! System is healthy.'
             slackSend(
-                channel: '#general', 
-                color: 'good', 
-                tokenCredentialId: 'slack-token', //
+                channel: '#all-superheros', // Change this from #general
+                color: 'good',
+                tokenCredentialId: 'slack-token',
                 message: "SUCCESS: Job '${env.JOB_NAME}' [${env.BUILD_NUMBER}] (${env.BUILD_URL})"
             )
         }
+    }
         failure {
             echo 'Build Failed! Check the logs.'
             slackSend(
