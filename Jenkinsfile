@@ -2,67 +2,70 @@ pipeline {
     agent any
 
     environment {
-        REPO_URL = 'git@github.com:Shivm-ops/bike-rental.git'
         SLACK_CHANNEL = '#all-superheros'
     }
 
     stages {
         stage('Cleanup') {
             steps {
-                echo 'Cleaning up previous workspace...'
+                echo 'Cleaning up the workspace...'
                 cleanWs() 
             }
         }
 
-      stage('Checkout') {
-    steps {
-        echo "Fetching code from main branch..."
-        // This command automatically inherits the 'main' branch setting from the UI
-        checkout scm 
-    }
-}
+        stage('Checkout') {
+            steps {
+                echo "Fetching code from main branch..."
+                // This ensures Jenkins uses the correct branch and SSH key
+                checkout scm 
+            }
+        }
+
         stage('Install Dependencies') {
             steps {
-                echo 'Installing npm packages...'
-                sh 'npm install' 
+                echo 'Installing frontend dependencies...'
+                // THIS IS THE FIX: Jenkins moves into the 'frontend' folder
+                dir('frontend') {
+                    sh 'npm install'
+                }
             }
         }
 
         stage('Build') {
             steps {
-                echo 'Building the production files...'
-                sh 'npm run build' 
+                echo 'Building the production app...'
+                dir('frontend') {
+                    sh 'npm run build'
+                }
             }
         }
 
         stage('Deploy') {
             steps {
-                echo 'Moving files to Nginx server...'
-                // Ensure 'jenkins' user has sudo access as we discussed
-                sh 'sudo cp -R dist/* /var/www/html/' 
-                echo 'Deployment complete!'
+                echo 'Deploying build files to Nginx...'
+                // Copies the build results from frontend/dist to Nginx root
+                sh 'sudo cp -R frontend/dist/* /var/www/html/'
+                echo 'Deployment finished!'
             }
         }
     }
 
     post {
         success {
-            echo 'Build and Deployment Successful!'
             slackSend(
                 channel: "${env.SLACK_CHANNEL}",
                 color: 'good',
                 tokenCredentialId: 'slack-token',
-                message: "✅ *SUCCESS*: Job '${env.JOB_NAME}' [${env.BUILD_NUMBER}]\nURL: ${env.BUILD_URL}"
+                message: "✅ *SUCCESS*: Project '${env.JOB_NAME}' Build #${env.BUILD_NUMBER} is Live!"
             )
         }
         failure {
-            echo 'Pipeline Failed!'
             slackSend(
                 channel: "${env.SLACK_CHANNEL}",
                 color: 'danger',
                 tokenCredentialId: 'slack-token',
-                message: "❌ *FAILED*: Job '${env.JOB_NAME}' [${env.BUILD_NUMBER}]\nLogs: ${env.BUILD_URL}console"
+                message: "❌ *FAILED*: Project '${env.JOB_NAME}' Build #${env.BUILD_NUMBER}\nCheck logs here: ${env.BUILD_URL}console"
             )
         }
     }
-} 
+}
