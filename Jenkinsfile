@@ -57,4 +57,16 @@ pipeline {
                 channel: "${env.SLACK_CHANNEL}",
                 color: 'good',
                 tokenCredentialId: 'slack-token',
-                message: "✅ *SUCCESS*: Job '${env.
+                message: "✅ *SUCCESS*: Job '${env.JOB_NAME}' [${env.BUILD_NUMBER}]\nURL: ${env.BUILD_URL}"
+            )
+        }
+        failure {
+            echo 'Pipeline Failed!'
+            slackSend(
+                channel: "${env.SLACK_CHANNEL}",
+                color: 'danger',
+                tokenCredentialId: 'slack-token',
+                message: "❌ *FAILED*: Job '${env.JOB_NAME}' [${env.BUILD_NUMBER}]\nLogs: ${env.BUILD_URL}console"
+            )
+        }
+    }
