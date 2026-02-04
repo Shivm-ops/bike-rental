@@ -14,13 +14,13 @@ pipeline {
             }
         }
 
-        stage('Checkout') {
-            steps {
-                echo "Fetching code from ${env.REPO_URL}..."
-                git credentialsId: 'github-ssh-key', url: "${env.REPO_URL}"
-            }
-        }
-
+      stage('Checkout') {
+    steps {
+        echo "Fetching code from main branch..."
+        // This command automatically inherits the 'main' branch setting from the UI
+        checkout scm 
+    }
+}
         stage('Install Dependencies') {
             steps {
                 echo 'Installing npm packages...'
